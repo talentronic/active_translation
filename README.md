@@ -14,8 +14,6 @@ If you find a bug or problem, please report it. If you have an idea for a new fe
 
 ActiveTranslation is a Rails plugin that lets you easily translate ActiveRecord models. With a single line added to that model, you can declare which columns, which locales, and what constraints to allow or prevent translation.
 
-ActiveTranslation was built at and is sponsored by [Talentronic](https://talentronic.com)
-
 
 ## How does this differ from internationalization (`I18n`)?
 
@@ -343,6 +341,7 @@ ActiveTranslation doesn't check the accuracy of translations in any way. It assu
 So if you use the for an EULA, make it a manual attribute or don't use ActiveTranslation for it at all.
 
 ActiveTranslation doesn't redact any content. It assumes you would never send PII or financial data for translation. So... please don't.
+
 
 ## Testing
 
