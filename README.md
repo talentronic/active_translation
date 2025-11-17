@@ -33,7 +33,7 @@ Instead, what if you just add a single line to your `Category` model. Now produc
 Add the gem to your gemfile:
 
 ```ruby
-gem "active_translation", git: "https://github.com/seanhogge/active_translation"
+gem "active_translation"
 ```
 
 And then bundle:
