@@ -24,16 +24,19 @@ module ActiveTranslation
         # Respond to calls such as fr_translation or de_translation
         # Respond to calls such as model.name(locale: :fr)
         define_method(:method_missing) do |method_name, *args, &block|
-          super() unless method_name.to_s.split("_").size == 2
+          # if the method name doesn't have an underscore with at least 1 character on both sides
+          super(method_name, *args, &block) unless method_name.to_s.split("_", 2).reject(&:blank?).size == 2
 
           locale = method_name.to_s.split("_").first
           attribute = method_name.to_s.split("_").last
 
+          # if something like "model.fr_title" is being called (no =)
           if translation_config[:manual_attributes].include? attribute
             translation = translations.find_by(locale: locale)
             return read_attribute(attribute) unless translation
 
             translation.translated_attributes[attribute].presence || read_attribute(attribute)
+          # if something like "model.fr_title = 'Zut alors' is being called"
           elsif attribute.last == "=" && translation_config[:manual_attributes].include?(attribute.delete("="))
             attribute.delete!("=")
             translation = translations.find_or_initialize_by(locale: locale.to_s)
@@ -41,8 +44,12 @@ module ActiveTranslation
             attrs[attribute] = args.first
             translation.translated_attributes = attrs
             translation.save!
+          # if something like "model.fr_translation" is being called
           elsif attribute == "translation" || translation_config[:attributes].include?(attribute)
             translations.find_by(locale: locale)
+          # if some method with an underscore that doesn't match anything above
+          else
+            super(method_name, *args, &block)
           end
         end
 
