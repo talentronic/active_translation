@@ -168,6 +168,28 @@ Manual attributes have a special setter in the form of `#{locale}_#{attribute_na
 
 These attributes never trigger retranslation, and are never checked against the original text - it's entirely up to you to maintain them. However, it does get stored alongside all the other translations, keeping your database tidy and your translation code consistent.
 
+### Caching
+
+You may have a model where many records share the same translated content. For instance a table of jobs might have thousands or millions of "housekeeper" jobs, all with the title "Housekeeper" or "Houseperson". It would be foolish and expensive to make a call to translate these repeatedly.
+
+Thus, you can add the `cache` directive. You can set it to `true`, to a `String` or `Symbol`, or to an `Array`
+
+If `true`, then all calls to translate that model will be cached. So if you have Job ID 1 with a title of "Sales Manager" and you translate it, Active Translation will reach out and get a translation for all the locales for "Sales Manager".
+
+If you have Job ID 2 with the same "Sales Manager" title, translating it will result in no call being made for the title - it's already stored in the Active Translation cache.
+
+If you have a different model, like a `JobTemplate` that has an attribute called `template_title` and no caching enabled, translating that `JobTemplate` will **still** use the cache. The overhead of this indexed database lookup is worth the savings.
+
+So you can't control when Active Translation looks for a cached value, but you can control what gets entered into the cache.
+
+When `cache: true` is set, all translatable attributes will be cached.
+
+When `cache: :subhead` is set, only the `subhead` attribute translations will be cached.
+
+When `cache: [ :name, :heading ]` is set, only the `name` and `heading` translations will be cached.
+
+So don't cache attributes that are huge or unlikely to ever be duplicated. For instance, do not cache an attribute that holds HTML content, or probably anything that's a TEXT column in the database. Unless, of course, those large text columns actually are frequently duplicated. Use your ~~brain~~ discretion.
+
 ### The Show
 
 Once you have added the `translates` directive with your columns, locales, and constraints and your models have been translated to at least one locale, it's time to actually use them.

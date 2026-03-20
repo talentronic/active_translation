@@ -577,33 +577,99 @@ class TranslatableTest < ActiveSupport::TestCase
   end
 
   test "with cache: true, translations create cache entries" do
-    job = jobs(:sales)
+    category = categories(:housekeeping)
 
-    assert_empty job.translations, "SETUP: the job should start with no translations".black.on_yellow
+    assert_empty category.translations, "SETUP: the category should start with no translations".black.on_yellow
 
-    assert_difference("ActiveTranslation::Cache.count", job.translatable_attribute_names.size * job.translatable_locales.size) do
-      job.translate_now!
+    assert_difference("ActiveTranslation::Cache.count", category.translatable_attribute_names.size * category.translatable_locales.size) do
+      category.translate_now!
     end
 
-    job.translatable_attribute_names.each do |attr|
-      job.translatable_locales.each do |locale|
-        assert job.translation_cached?(attr, locale)
+    category.translatable_attribute_names.each do |attr|
+      category.translatable_locales.each do |locale|
+        assert category.translation_cached?(attr, locale)
       end
     end
   end
 
   test "with cache: true, translations return cached values when checksums match" do
     cached_translation_text = "cached translation text"
-    job = jobs(:sales)
-    job.translate_now!
+    category = categories(:housekeeping)
+    category.translate_now!
 
     ActiveTranslation::Cache.update_all(translated_text: cached_translation_text)
 
-    job.translate_now!
+    category.translate_now!
 
-    job.translatable_attribute_names.each do |attr|
-      job.translatable_locales.each do |locale|
-        assert_equal cached_translation_text, job.send(attr, locale:)
+    category.translatable_attribute_names.each do |attr|
+      category.translatable_locales.each do |locale|
+        assert_equal cached_translation_text, category.send(attr, locale:)
+      end
+    end
+  end
+
+  test "with cache set to a string, only that attribute is cached" do
+    # jobs only cache title translations
+    job = jobs(:sales)
+
+    assert_difference(
+      "ActiveTranslation::Cache.count",
+      Array(job.translation_config[:cache]).size * job.translatable_locales.size,
+      "Translating should create #{Array(job.translation_config[:cache]).size * job.translatable_locales.size} cache entries",
+    ) do
+      job.translate_now!
+    end
+
+    job.translatable_locales.each do |locale|
+      assert job.translation_cached?(:title, locale), "There should be a cached title translation for the #{locale} locale".black.on_red
+      refute job.translation_cached?(:headline, locale), "There should not be a cached headline translation for the #{locale} locale".black.on_red
+      refute job.translation_cached?(:ad_html, locale), "There should not be a cached ad_html translation for the #{locale} locale".black.on_red
+    end
+  end
+
+  test "with cache set to an array, only those attributes are cached" do
+    # pages cache title and heading translations
+    page = pages(:home_page)
+    page.update(published: true, heading: "page heading")
+
+    assert_difference(
+      "ActiveTranslation::Cache.count",
+      page.translation_config[:cache].size * page.translatable_locales.size,
+      "Translating should create #{page.translation_config[:cache].size * page.translatable_locales.size} cache entries",
+    ) do
+      page.translate_now!
+    end
+
+    page.translatable_locales.each do |locale|
+      assert page.translation_cached?(:title, locale), "There should be a cached title translation for the #{locale} locale"
+      assert page.translation_cached?(:heading, locale), "There should be a cached heading translation for the #{locale} locale"
+      refute page.translation_cached?(:content, locale), "There should not be a cached content translation for the #{locale} locale".black.on_red
+    end
+  end
+
+  test "a model with no caching still pulls from the cache but doesn't create cache entries" do
+    cached_translation_text = "cached translation text"
+    employer = employers(:hilton)
+
+    employer.translatable_locales.each do |locale|
+      ActiveTranslation::Cache.create(
+        locale:,
+        checksum: Digest::MD5.hexdigest(employer.profile_html),
+        translated_text: cached_translation_text,
+      )
+    end
+
+    employer.translate_now!
+
+    employer.translatable_attribute_names.each do |attribute|
+      employer.translatable_locales.each do |locale|
+        assert employer.translation_cached?(attribute, locale), "translation_cached? should be true".black.on_red
+      end
+    end
+
+    employer.translatable_attribute_names.each do |attribute|
+      employer.translatable_locales.each do |locale|
+        assert_equal cached_translation_text, employer.send(attribute, locale:)
       end
     end
   end

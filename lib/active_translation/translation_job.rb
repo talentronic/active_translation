@@ -6,8 +6,9 @@ module ActiveTranslation
       translated_data = {}
 
       object.translatable_attribute_names.each do |attribute|
-        source_text = object.read_attribute(attribute)
-        translated_data[attribute.to_s] = object.translate_text(source_text, locale)
+        # source_text = object.read_attribute(attribute)
+        # translated_data[attribute.to_s] = object.translate_text(source_text, locale)
+        translated_data[attribute.to_s] = object.translate_attribute(attribute, locale)
       end
 
       translation = object.translations

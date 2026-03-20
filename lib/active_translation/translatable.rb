@@ -151,24 +151,40 @@ module ActiveTranslation
       end
     end
 
-    def translate_text(text, target_locale)
-      if translation_config[:cache]
-        cached_translation = ActiveTranslation::Cache.find_or_create_by(
-          checksum: text_checksum(text),
-          locale: target_locale,
-        )
-      end
+    def translate_attribute(attribute, locale)
+      return nil if send(attribute).nil?
+
+      cached_translation = ActiveTranslation::Cache.find_by(
+        checksum: text_checksum(send(attribute)),
+        locale: locale,
+      )
 
       translated_text = if Rails.env.test?
-        cached_translation&.translated_text || "[#{target_locale}] #{text}"
+        cached_translation&.translated_text || "[#{locale}] #{send(attribute)}"
       else
         cached_translation&.translated_text || ActiveTranslation::GoogleTranslate.translate(target_language_code: target_locale, text: text)
       end
 
-      if translation_config[:cache] && cached_translation.translated_text.nil?
-        cached_translation.update(
-          translated_text:,
-        )
+      case translation_config[:cache]
+      when TrueClass
+        ActiveTranslation::Cache.find_or_create_by(
+          checksum: text_checksum(send(attribute)),
+          locale:,
+        ).update(translated_text:,)
+      when String, Symbol
+        return unless attribute.to_s == translation_config[:cache].to_s
+
+        ActiveTranslation::Cache.find_or_create_by(
+          checksum: text_checksum(send(attribute)),
+          locale:,
+        ).update(translated_text:,)
+      when Array
+        return unless translation_config[:cache].map(&:to_s).include? attribute.to_s
+
+        ActiveTranslation::Cache.find_or_create_by(
+          checksum: text_checksum(send(attribute)),
+          locale:,
+        ).update(translated_text:,)
       end
 
       translated_text
