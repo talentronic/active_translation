@@ -575,4 +575,36 @@ class TranslatableTest < ActiveSupport::TestCase
       assert_equal "Profile content", employer.profile_html, "The profile_html method should return the original content for the default locale".black.on_red
     end
   end
+
+  test "with cache: true, translations create cache entries" do
+    job = jobs(:sales)
+
+    assert_empty job.translations, "SETUP: the job should start with no translations".black.on_yellow
+
+    assert_difference("ActiveTranslation::Cache.count", job.translatable_attribute_names.size * job.translatable_locales.size) do
+      job.translate_now!
+    end
+
+    job.translatable_attribute_names.each do |attr|
+      job.translatable_locales.each do |locale|
+        assert job.translation_cached?(attr, locale)
+      end
+    end
+  end
+
+  test "with cache: true, translations return cached values when checksums match" do
+    cached_translation_text = "cached translation text"
+    job = jobs(:sales)
+    job.translate_now!
+
+    ActiveTranslation::Cache.update_all(translated_text: cached_translation_text)
+
+    job.translate_now!
+
+    job.translatable_attribute_names.each do |attr|
+      job.translatable_locales.each do |locale|
+        assert_equal cached_translation_text, job.send(attr, locale:)
+      end
+    end
+  end
 end

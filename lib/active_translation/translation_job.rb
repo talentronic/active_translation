@@ -7,7 +7,7 @@ module ActiveTranslation
 
       object.translatable_attribute_names.each do |attribute|
         source_text = object.read_attribute(attribute)
-        translated_data[attribute.to_s] = translate_text(source_text, locale)
+        translated_data[attribute.to_s] = object.translate_text(source_text, locale)
       end
 
       translation = object.translations
@@ -23,14 +23,6 @@ module ActiveTranslation
         translated_attributes: merged_attributes,
         source_checksum: checksum
       )
-    end
-
-    private
-
-    def translate_text(text, target_locale)
-      return "[#{target_locale}] #{text}" if Rails.env.test?
-
-      ActiveTranslation::GoogleTranslate.translate(target_language_code: target_locale, text: text)
     end
   end
 end

@@ -3,13 +3,14 @@ module ActiveTranslation
     extend ActiveSupport::Concern
 
     class_methods do
-      def translates(*attributes, manual: [], into:, unless: nil, if: nil)
+      def translates(*attributes, manual: [], into:, unless: nil, if: nil, cache: false)
         @translation_config ||= {}
         @translation_config[:attributes] = Array(attributes).map(&:to_s)
         @translation_config[:manual_attributes] = Array(manual).map(&:to_s)
         @translation_config[:locales] = into
         @translation_config[:unless] = binding.local_variable_get(:unless)
         @translation_config[:if] = binding.local_variable_get(:if)
+        @translation_config[:cache] = cache
 
         has_many :translations, class_name: "ActiveTranslation::Translation", as: :translatable, dependent: :destroy
 
@@ -150,6 +151,36 @@ module ActiveTranslation
       end
     end
 
+    def translate_text(text, target_locale)
+      if translation_config[:cache]
+        cached_translation = ActiveTranslation::Cache.find_or_create_by(
+          checksum: text_checksum(text),
+          locale: target_locale,
+        )
+      end
+
+      translated_text = if Rails.env.test?
+        cached_translation&.translated_text || "[#{target_locale}] #{text}"
+      else
+        cached_translation&.translated_text || ActiveTranslation::GoogleTranslate.translate(target_language_code: target_locale, text: text)
+      end
+
+      if translation_config[:cache] && cached_translation.translated_text.nil?
+        cached_translation.update(
+          translated_text:,
+        )
+      end
+
+      translated_text
+    end
+
+    def translation_cached?(attribute, locale)
+      ActiveTranslation::Cache.find_by(
+        checksum: text_checksum(send(attribute)),
+        locale:,
+      )
+    end
+
     def translation_checksum
       values = translatable_attribute_names.map { |attr| read_attribute(attr).to_s }
       Digest::MD5.hexdigest(values.join)
@@ -214,6 +245,10 @@ module ActiveTranslation
       return true unless translation_config[:if]
 
       evaluate_condition(translation_config[:if])
+    end
+
+    def text_checksum(text)
+      Digest::MD5.hexdigest(text)
     end
 
     def translatable_attributes_changed?

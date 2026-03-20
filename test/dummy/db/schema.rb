@@ -11,6 +11,13 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.0].define(version: 2025_09_22_194255) do
+  create_table "active_translation_cache", force: :cascade do |t|
+    t.string "locale", null: false
+    t.string "checksum"
+    t.text "translated_text"
+    t.index [ "checksum", "locale" ], name: "index_active_translation_cache_on_checksum_and_locale", unique: true
+  end
+
   create_table "active_translation_translations", force: :cascade do |t|
     t.string "translatable_type", null: false
     t.integer "translatable_id", null: false

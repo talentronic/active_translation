@@ -10,5 +10,13 @@ class CreateTranslations < ActiveRecord::Migration[7.0]
 
     add_index :active_translation_translations, [ :translatable_type, :translatable_id, :locale ],
       unique: true, name: "index_translations_on_translatable_and_locale"
+
+    create_table :active_translation_cache do |t|
+      t.string :locale, null: false
+      t.string :checksum
+      t.text :translated_text
+    end
+
+    add_index :active_translation_cache, [ :checksum, :locale ], unique: true
   end
 end
