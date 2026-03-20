@@ -169,7 +169,7 @@ module ActiveTranslation
       translated_text = if Rails.env.test?
         cached_translation&.translated_text || "[#{locale}] #{send(attribute)}"
       else
-        cached_translation&.translated_text || ActiveTranslation::GoogleTranslate.translate(target_language_code: target_locale, text: text)
+        cached_translation&.translated_text || ActiveTranslation::GoogleTranslate.translate(target_language_code: locale, text: text)
       end
 
       case translation_config[:cache]
