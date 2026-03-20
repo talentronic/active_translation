@@ -168,22 +168,14 @@ module ActiveTranslation
 
       translated_text = cached_translation&.translated_text || ActiveTranslation::GoogleTranslate.translate(target_language_code: locale, text: send(attribute))
 
-      case translation_config[:cache]
-      when TrueClass
-        ActiveTranslation::Cache.find_or_create_by(
-          checksum: text_checksum(send(attribute)),
-          locale:,
-        ).update(translated_text:,)
-      when String, Symbol
-        return unless attribute.to_s == translation_config[:cache].to_s
+      should_cache = case translation_config[:cache]
+      when TrueClass then true
+      when String, Symbol then attribute.to_s == translation_config[:cache].to_s
+      when Array then translation_config[:cache].map(&:to_s).include?(attribute.to_s)
+      else false
+      end
 
-        ActiveTranslation::Cache.find_or_create_by(
-          checksum: text_checksum(send(attribute)),
-          locale:,
-        ).update(translated_text:,)
-      when Array
-        return unless translation_config[:cache].map(&:to_s).include? attribute.to_s
-
+      if should_cache
         ActiveTranslation::Cache.find_or_create_by(
           checksum: text_checksum(send(attribute)),
           locale:,
