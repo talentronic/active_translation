@@ -6,6 +6,8 @@ module ActiveTranslation
   class GoogleTranslate
     class << self
       def translate(target_language_code:, text:, source: "en-US", obj: nil)
+        return "[#{target_language_code}] #{text}" if Rails.env.test?
+
         conn = Faraday.new(url: "https://translation.googleapis.com/") do |faraday|
           faraday.request :json
           faraday.response :json
