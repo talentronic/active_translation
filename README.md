@@ -108,8 +108,6 @@ or
 translates :content, into: -> { I18n.available_locales - [ I18n.default_locale ] }
 ```
 
-> `it` is a recent Ruby syntactical grain of sugar. It's the same as `_1` which lets you skip the `{ |arg| arg == :stuff }` repetition
-
 #### Into All
 
 Because translating a model into all the locales your app may define is so common, you can pass `:all` to the `into` argument to achieve the same result as passing `-> { I18n.available_locales - [ I18n.default_locale ] }`.
@@ -360,9 +358,9 @@ You can call `translation_config` on a model or instance to see what you've set 
 
 ActiveTranslation doesn't check the accuracy of translations in any way. It assumes that the response from Google is always perfect. If you are translating sensitive content where accuracy is critical in a legal or existential sense, you must handle translation auditing separately.
 
-So if you use the for an EULA, make it a manual attribute or don't use ActiveTranslation for it at all.
+So if you use Active Translation for a column that contains legal language like an end-user license agreement (EULA), make it a manual attribute or don't use ActiveTranslation for it at all.
 
-ActiveTranslation doesn't redact any content. It assumes you would never send PII or financial data for translation. So... please don't.
+ActiveTranslation doesn't redact any content. It assumes you would never send PII or financial data for translation. So please don't.
 
 
 ## Testing
