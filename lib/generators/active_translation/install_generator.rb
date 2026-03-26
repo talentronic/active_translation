@@ -11,7 +11,7 @@ module ActiveTranslation
       end
 
       def copy_migration
-        migration_template "create_translations.rb", "db/migrate/create_translations.rb"
+        migration_template "create_active_translation_tables.rb", "db/migrate/create_active_translation_tables.rb"
       end
 
       def copy_initializer

@@ -1,4 +1,4 @@
-class CreateTranslations < ActiveRecord::Migration[7.0]
+class CreateActiveTranslationTables < ActiveRecord::Migration[7.0]
   def change
     create_table :active_translation_translations do |t|
       t.references :translatable, polymorphic: true, null: false
