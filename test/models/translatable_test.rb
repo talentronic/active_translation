@@ -673,4 +673,50 @@ class TranslatableTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "metaprogrammed methods for translated attributes return strings or nil" do
+    page = pages :home_page
+    page.update published: true
+
+    assert_difference(
+      "ActiveTranslation::Cache.count",
+      page.translatable_locales.size * Array(page.translation_config[:cache]).size,
+    ) do
+      page.translate_now!
+    end
+
+    page.translatable_locales.each do |locale|
+      page.translatable_attribute_names.each do |attribute|
+        assert_includes [ String, NilClass ], page.send("#{locale}_#{attribute}").class
+      end
+    end
+  end
+
+  test "a model with some attributes cached as an array still persists translations that aren't cached" do
+    page = pages :home_page
+    page.update published: true
+
+    manual_attributes = page.translation_config[:manual_attributes]
+    auto_attributes = page.translation_config[:attributes] - manual_attributes
+
+    assert_difference(
+      "ActiveTranslation::Cache.count",
+      page.translatable_locales.size * Array(page.translation_config[:cache]).size,
+    ) do
+      page.translate_now!
+    end
+
+    page.translatable_locales.each do |locale|
+      auto_attributes.each do |attribute|
+        assert page.send("#{locale}_#{attribute}")
+        assert_not_equal page.send("#{locale}_#{attribute}"), page.send(attribute)
+      end
+    end
+
+    page.translatable_locales.each do |locale|
+      page.translation_config[:cache].each do |attribute|
+        assert page.translation_cached?(attribute, locale)
+      end
+    end
+  end
 end

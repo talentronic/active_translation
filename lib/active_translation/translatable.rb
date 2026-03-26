@@ -31,7 +31,7 @@ module ActiveTranslation
           attribute = method_name.to_s.split("_").last
 
           # if something like "model.fr_title" is being called (no =)
-          if translation_config[:manual_attributes].include? attribute
+          if (translation_config[:attributes] + translation_config[:manual_attributes]).include? attribute
             translation = translations.find_by(locale: locale)
             return read_attribute(attribute) unless translation
 

@@ -2,7 +2,7 @@
 
 home_page:
   title: Home Page
-  heading:
+  heading: Home Page Heading
   subhead: MyString
   content: |-
     <h4>Heading</h4>
