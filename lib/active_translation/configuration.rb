@@ -10,7 +10,8 @@ module ActiveTranslation
       :token_uri,
       :auth_provider_x509_cert_url,
       :client_x509_cert_url,
-      :universe_domain
+      :universe_domain,
+      :non_mock_environments
 
     def initialize
       @type = nil
@@ -24,6 +25,7 @@ module ActiveTranslation
       @auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
       @client_x509_cert_url = nil
       @universe_domain = "googleapis.com"
+      @non_mock_environments = [ :production ]
     end
   end
 end

@@ -11,4 +11,6 @@ ActiveTranslation.configure do |config|
   config.token_uri = ENV.fetch("GOOGLE_TRANSLATION_TOKEN_URI", "https://oauth2.googleapis.com/token")
   config.auth_provider_x509_cert_url = ENV.fetch("GOOGLE_TRANSLATION_AUTH_PROVIDER_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs")
   config.universe_domain = ENV.fetch("GOOGLE_TRANSLATION_UNIVERSE_DOMAIN", "googleapis.com")
+
+  config.non_mock_environments = [ :production ]
 end

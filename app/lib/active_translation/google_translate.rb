@@ -5,28 +5,46 @@
 module ActiveTranslation
   class GoogleTranslate
     class << self
-      def translate(target_language_code:, text:, source: "en-US", obj: nil)
-        return "[#{target_language_code}] #{text}" if Rails.env.test?
+      def mock_api_responses?
+        !ActiveTranslation.configuration.non_mock_environments.map(&:to_s).include? Rails.env
+      rescue
+        !Rails.env.production?
+      end
 
-        conn = Faraday.new(url: "https://translation.googleapis.com/") do |faraday|
-          faraday.request :json
-          faraday.response :json
-          faraday.request :authorization, "Bearer", -> { token }
+      def translate(target_language_code:, text:, source: "en-US", obj: nil)
+        translated_text = if mock_api_responses?
+          text
+        else
+          conn = Faraday.new(url: "https://translation.googleapis.com/") do |faraday|
+            faraday.request :json
+            faraday.response :json
+            faraday.request :authorization, "Bearer", -> { token }
+          end
+
+          response =
+            conn.post(
+              "language/translate/v2",
+              {
+                q: text,
+                target: target_language_code,
+                source: source,
+              }
+            )
+
+          return nil unless response.success?
+
+          parse_response(response)
         end
 
-        response =
-          conn.post(
-            "language/translate/v2",
-            {
-              q: text,
-              target: target_language_code,
-              source: source,
-            }
-          )
+        if text.match?(/\A[A-Z]/)
+          translated_text.sub!(/\A./, &:upcase)
+        end
 
-        return nil unless response.success?
-
-        parse_response(response)
+        if mock_api_responses?
+          "[#{target_language_code}] #{translated_text}"
+        else
+          translated_text
+        end
       end
 
       private
@@ -36,7 +54,7 @@ module ActiveTranslation
       end
 
       def token
-        return "fake_access_token" if Rails.env.test?
+        return "fake_access_token" if mock_api_responses?
 
         Rails.cache.fetch("google_access_token", expires_in: 55.minutes) do
           google_oauth_credentials = ActiveTranslation.configuration.to_json

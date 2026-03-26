@@ -16,3 +16,4 @@ gem "rubocop-rails-omakase", require: false
 gem "pry"
 gem "colorize"
 gem "dotenv-rails", groups: [ :development, :test ]
+gem "webmock", groups: [ :test ]

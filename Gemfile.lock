@@ -92,6 +92,9 @@ GEM
     colorize (1.1.0)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.4)
+    crack (1.0.1)
+      bigdecimal
+      rexml
     crass (1.0.6)
     date (3.4.1)
     dotenv (3.1.8)
@@ -121,6 +124,7 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
+    hashdiff (1.2.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.1)
@@ -233,6 +237,7 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
+    rexml (3.4.4)
     rubocop (1.81.1)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -281,6 +286,10 @@ GEM
     unicode-emoji (4.1.0)
     uri (1.0.4)
     useragent (0.16.11)
+    webmock (3.26.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
@@ -300,6 +309,7 @@ DEPENDENCIES
   puma
   rubocop-rails-omakase
   sqlite3
+  webmock
 
 BUNDLED WITH
    2.6.8
