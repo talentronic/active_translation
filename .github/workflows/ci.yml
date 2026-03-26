@@ -47,6 +47,35 @@ jobs:
         env:
           RAILS_ENV: test
           # REDIS_URL: redis://localhost:6379/0
+          GOOGLE_TRANSLATION_PRIVATE_KEY: |
+            -----BEGIN PRIVATE KEY-----
+            MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDQbNN7Fpv9exFD
+            64k/GMSPCLvS1/MwdD7qmY8G1Za76iU+jPZeqKCeqTnS42mpBgxZuQDVg3QAYGY/
+            2M4ZoMAhqkHh7Z54efEi0E2n5x8OTubhEI04CtW+f7tjBs/stMFpc4YDRg1Tm54B
+            HPpuoJ5zXovYUyUcD/9eyoqw0MRV63LE6HKw4Kf5GIc//hMHUs4X3XPQcxEvOKXO
+            RmGVQTW0iZICpZ5NnB5K2Hs1WrQ7hC+IOwpv3vuyh61eYNk56YOny7WomRGTL74O
+            zuq6iU0Dk3laWuVzRNDPAHLUhKt/415bN/vfYuczTMumB9t9rDvq2KF3xvCgm1Uq
+            CBvCBFcdAgMBAAECggEAFcH+k79o+l2yEDaS5cjWoB3nyZtskjbYaJIuOabrbOOF
+            DtIVWA1fcyC0Xh0KZzAv8t/aw+9MmUt28RxXa5p55CnLZePx4p7MOvem26vHdK1s
+            8brSGzMaXCAmdjB8XTgDZtg9+bKC6qL4rCITzJ+s2ttYWvVXDuZmoMUhFFM+478X
+            tqE1VJF1QLYjiz085eIVYF06fF1z+lWkU5h7gUoS2U5zBqwmBVnuYz7o2wDvlIV5
+            EQhk9FXKwtIRS2DvaQMn5tdnoIc+AWT3EnR+AiW2qOdyDQ3uEyIuPS02a3l1JDU+
+            xTDK4Qya4w0qy49+LVQnRkP/uqxlZmJlj/wHH0YS4QKBgQD0ZZ7Vi669VUizvcm4
+            Nyw+e6GQcaNvWBPHOtVhb6FLQYEhB6y3XD9TCDFn5xKv7NEBF/S4ADbKhBij9Gd1
+            4xF30rqzfESniwOv65R4kH/EE72Muiy9mP7hB0+sM4TFQ6l8FRGBoiQEqfmnEj/L
+            LAC5px2+HkXHkeAJGTyNxqqYbQKBgQDaUgHAs4/02U5PgAFF6QQbe7tcTdgOqXOJ
+            RWlwL+SmFwJd95RQPTF5EEakxjKEQyK0XCBOGxAU3rNvEFkJwsaTLQHy2ktNLU+t
+            1/VMLdOyVhQKgSkxX5FXD5xvaupcTcLRg0pEEBm/zldu3RLt/nnQHgBzGxXg1Ddl
+            8fCmuRfrcQKBgQDl4/0vpHAfWuzDXoA0T3nH4KWOaMaywuf/3UDAoa/YSWq89ioq
+            ZJSQd0F6GitC3wGPBMjGmDTx9KX0+76ibpCM5OWIVhmCfEpgnboQWuREPclsaegS
+            BKukYys3sVJv+ICh3nOUPD+jP3w+AvWNGPwppqBcqL88xeQ2ys1iE4F/VQKBgQDT
+            Duas4aqw3YfMaYZRjKQw4ZxO7t6Jxh1wvo7hKxvTyXi7WQajz5TNYgO5dfYOUUzy
+            qgF9IMKaOnWjUF2Thx4r2B4DJjAYC071VErK+56l0HuNcDJfjfFXBjuIpwasd2x4
+            2YDpbdtGx3dVMRoExLgEj4yFutCayu5Heu7YbyYFsQKBgGwWoUdkij5Fb3OS0i/V
+            3fcxc8udVqD0ZbZ2KgpT78A9Pg4l1Vk0juf++kEHoA6GaH/43iadXnd3rUGJXvle
+            AdPKgQSDdGRf1dFkR65fmbtvAj4+B0dqPfuw1RyWloLaBYPq4g/kpXOTxA2nxAaD
+            IC/+mzU2rjCjdbHjV+2HQHkN
+            -----END PRIVATE KEY-----
         run: |-
           bin/rails db:test:prepare
           bin/rails test
