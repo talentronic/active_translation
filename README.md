@@ -354,6 +354,19 @@ You can call `translation_config` on a model or instance to see what you've set 
 => {attributes: [:profile_html], manual_attributes: ["name"], locales: :method_that_returns_locales, unless: nil, if: nil}
 ```
 
+
+### Translation Without Objectification
+
+You might want to use ActiveTranslation to translate a random string that has no connection to an ActiveRecord model. You can do that with `ActiveTranslation.translate` method.
+
+```ruby
+ActiveTranslation.translate("some string to translate", locale: :fr)
+```
+
+This will return the translated string, and it will cache the result so future calls to translate won't hit the API. You can pass `cache: false` to not cache the result, and also to not return an already cached result.
+
+```ruby
+
 #### Disclaimer
 
 ActiveTranslation doesn't check the accuracy of translations in any way. It assumes that the response from Google is always perfect. If you are translating sensitive content where accuracy is critical in a legal or existential sense, you must handle translation auditing separately.

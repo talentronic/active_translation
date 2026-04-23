@@ -123,6 +123,74 @@ class ActiveTranslationTest < ActiveSupport::TestCase
     end
   end
 
+  test "strings unconnected to objects can be translated" do
+    text = "gardener"
+    expected_translation = "[fr] gardener"
+
+    assert_equal expected_translation, ActiveTranslation.translate(text:, locale: :fr)
+  end
+
+  test "strings unconnected to objects are cached when translated" do
+    locale = :fr
+    text = "gardener"
+    expected_translation = "[fr] gardener"
+
+    assert_difference("ActiveTranslation::Cache.count", 1) do
+      ActiveTranslation.translate(text:, locale:)
+    end
+
+    cached_translation = ActiveTranslation::Cache.lookup(locale:, text:)
+
+    assert_equal expected_translation, cached_translation
+  end
+
+  test "strings unconnected to objects return cached translations when available" do
+    text = "gardener"
+    expected_translation = "[fr] gardener"
+
+    ActiveTranslation::Cache.add!(locale: :fr, original_text: text, translated_text: expected_translation)
+
+    assert_no_difference("ActiveTranslation::Cache.count") do
+      translation = ActiveTranslation.translate(text:, locale: :fr)
+      assert_equal expected_translation, translation
+    end
+
+    Rails.stub(:env, ActiveSupport::StringInquirer.new("production")) do
+      ActiveTranslation.translate(
+        locale: :fr,
+        text:,
+      )
+
+      assert_not_requested @token_stub
+      assert_not_requested @translate_stub
+    end
+  end
+
+  test "strings unconnected to objects can be translated without caching" do
+    text = "gardener"
+    expected_translation = "[fr] gardener"
+
+    assert_no_difference("ActiveTranslation::Cache.count") do
+      translation = ActiveTranslation.translate(text:, locale: :fr, cache: false)
+      assert_equal expected_translation, translation
+    end
+
+    assert_nil ActiveTranslation::Cache.lookup(locale: :fr, text:)
+  end
+
+  test "strings unconnected to objects make an API call even if a cache match exists when passing cache: false" do
+    locale = :fr
+    text = "gardener"
+    expected_translation = "[fr] gardener"
+    cached_translation = "should not be returned"
+
+    ActiveTranslation::Cache.add!(locale:, original_text: text, translated_text: cached_translation)
+
+    translation = ActiveTranslation.translate(text:, locale:, cache: false)
+
+    assert_equal expected_translation, translation
+  end
+
   private
 
   def stubs

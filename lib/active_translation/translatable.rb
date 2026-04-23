@@ -161,12 +161,12 @@ module ActiveTranslation
     def translate_attribute(attribute, locale)
       return nil if send(attribute).nil?
 
-      cached_translation = ActiveTranslation::Cache.find_by(
-        checksum: text_checksum(send(attribute)),
-        locale: locale,
+      cached_translation = Cache.lookup(
+        locale:,
+        text: send(attribute),
       )
 
-      translated_text = cached_translation&.translated_text || ActiveTranslation::GoogleTranslate.translate(target_language_code: locale, text: send(attribute))
+      translated_text = cached_translation || ActiveTranslation::GoogleTranslate.translate(target_language_code: locale, text: send(attribute))
 
       should_cache = case translation_config[:cache]
       when TrueClass then true
@@ -176,10 +176,11 @@ module ActiveTranslation
       end
 
       if should_cache
-        ActiveTranslation::Cache.find_or_create_by(
-          checksum: text_checksum(send(attribute)),
+        Cache.add!(
           locale:,
-        ).update(translated_text:,)
+          original_text: send(attribute),
+          translated_text:,
+        )
       end
 
       translated_text

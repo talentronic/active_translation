@@ -17,5 +17,21 @@ module ActiveTranslation
     def configure
       yield(configuration)
     end
+
+    def translate(text:, locale:, cache: true)
+      text = text.to_s
+      locale = locale.to_s
+
+      if cache
+        cached_translation = Cache.find_by(locale:, checksum: Digest::MD5.hexdigest(text))
+        return cached_translation.translated_text if cached_translation
+      end
+
+      translated_text = GoogleTranslate.translate(target_language_code: locale, text:)
+
+      Cache.add!(locale:, original_text: text, translated_text:) if cache
+
+      translated_text
+    end
   end
 end
