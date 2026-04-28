@@ -17,3 +17,4 @@ gem "pry"
 gem "colorize"
 gem "dotenv-rails", groups: [ :development, :test ]
 gem "webmock", groups: [ :test ]
+gem "minitest-mock", groups: [ :test ]
