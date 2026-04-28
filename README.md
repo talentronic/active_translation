@@ -365,7 +365,6 @@ ActiveTranslation.translate("some string to translate", locale: :fr)
 
 This will return the translated string, and it will cache the result so future calls to translate won't hit the API. You can pass `cache: false` to not cache the result, and also to not return an already cached result.
 
-```ruby
 
 #### Disclaimer
 
